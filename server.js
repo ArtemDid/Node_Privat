@@ -19,10 +19,10 @@ server.get('/', (req, res) => {
 
     axios({
         method: 'get',
-        url: 'https://api.privatbank.ua/p24api/exchange_rates?json&date=01.12.2020'
+        url: 'https://api.privatbank.ua/p24api/exchange_rates?json&date=05.03.2021'
     })
         .then(response => {
-            console.log(response.data.exchangeRate[23]);
+            console.log(response.data.exchangeRate[24]);
 
             res.send(response.data);
         })
