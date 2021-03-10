@@ -20,7 +20,7 @@ const insertDB = (query, user_name, date, answer) => {
                 if (results==='undefined') {
                     resolve('OK');
                 }
-                console.log(results.rows[0].id)
+                // console.log(results.rows[0].id)
             });
 
     })
