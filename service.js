@@ -14,9 +14,9 @@ const insertDB = (query, user_name, date, answer) => {
 
         pool.query('INSERT INTO history (query, user_name, date, answer) VALUES ($1, $2, $3, $4) RETURNING *',
             [query, user_name, date, answer], (error, results) => {
-                if (error) {
-                    reject(error)
-                }
+                // if (error) {
+                //     reject(error)
+                // }
                 if (results==='undefined') {
                     resolve('OK');
                 }
