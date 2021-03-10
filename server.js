@@ -10,9 +10,6 @@ server.use(bodyParser.urlencoded({ extended: false }));
 server.use(bodyParser.json());
 server.use(cors());
 
-
-const SERVER_PORT = 3001;
-
 const TELEGRAM_BOT_TOKEN = "1545875277:AAEqj7EcbMLq1POWeiJHoJz8_2wxufrrRfs";
 
 const BUTTONS = {
@@ -135,7 +132,7 @@ bot.on('/start', (msg) => {
                 [BUTTONS.hello.label, BUTTONS.world.label],
                 [BUTTONS.hide.label]
             ], { resize: true });
-            
+
             return bot.sendMessage(msg.chat.id, 'See keyboard below.', { replyMarkup });
 
         })
