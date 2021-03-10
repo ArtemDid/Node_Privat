@@ -3,21 +3,13 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const axios = require('axios');
 const TeleBot = require('telebot');
-const Pool = require('pg').Pool;
+const service = require('./service')
 
 const server = express();
 server.use(bodyParser.urlencoded({ extended: false }));
 server.use(bodyParser.json());
 server.use(cors());
 
-const pool = new Pool({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'history',
-    password: '123456',
-    port: 5432,
-    ssl: false
-});
 
 const SERVER_PORT = 3001;
 
@@ -48,20 +40,25 @@ const bot = new TeleBot({
     }
 });
 
-
-
 bot.on(/^\d{2}(.)\d{2}\1\d{4}$/, (msg) => {
+
+    let date = new Date(Date.now());
 
     axios({
         method: 'get',
         url: `https://api.privatbank.ua/p24api/exchange_rates?json&date=${msg.text}`
     })
         .then(response => {
-            // console.log(response.data.exchangeRate[23]);
             let itemUSD = response.data.exchangeRate.filter(item => item.currency === "USD");
-            console.log(itemUSD);
 
-            msg.reply.text(`SaleRate: ${itemUSD[0].saleRate} UAH \nPurchaseRate: ${itemUSD[0].purchaseRate} UAH`);
+            service.insertDB(msg.text, msg.from.first_name, date.toISOString(),
+                `SaleRate: ${itemUSD[0].saleRate} UAH PurchaseRate: ${itemUSD[0].purchaseRate} UAH`)
+                .then(() => {
+                    msg.reply.text(`SaleRate: ${itemUSD[0].saleRate} UAH \nPurchaseRate: ${itemUSD[0].purchaseRate} UAH`);
+                })
+                .catch(error => {
+                    msg.reply.text(error.message);
+                })
         })
         .catch(error => {
             msg.reply.text(error.message);
@@ -73,9 +70,7 @@ bot.on('/now', (msg) => {
     let day = date.getDate();
     let month = date.getMonth() + 1;
     let year = date.getFullYear();
-    console.log(day);
-    console.log(month);
-    console.log(year);
+
     axios({
         method: 'get',
         url: `https://api.privatbank.ua/p24api/exchange_rates?json&date=${day}.${month}.${year}`
@@ -83,13 +78,14 @@ bot.on('/now', (msg) => {
         .then(response => {
             let itemUSD = response.data.exchangeRate.filter(item => item.currency === "USD");
             // console.log(msg);
-
-            pool.query('INSERT INTO history (query, user_name, date, answer) VALUES ($1, $2, $3, $4) RETURNING *', 
-            ['/now', msg.from.first_name, date.toISOString(), 
-            `SaleRate: ${itemUSD[0].saleRate} UAH PurchaseRate: ${itemUSD[0].purchaseRate} UAH`], (error, results) => {
-
-                msg.reply.text(`SaleRate: ${itemUSD[0].saleRate} UAH \nPurchaseRate: ${itemUSD[0].purchaseRate} UAH`);
-            })
+            service.insertDB(msg.text, msg.from.first_name, date.toISOString(),
+                `SaleRate: ${itemUSD[0].saleRate} UAH PurchaseRate: ${itemUSD[0].purchaseRate} UAH`)
+                .then(() => {
+                    msg.reply.text(`SaleRate: ${itemUSD[0].saleRate} UAH \nPurchaseRate: ${itemUSD[0].purchaseRate} UAH`);
+                })
+                .catch(error => {
+                    msg.reply.text(error.message);
+                })
 
         })
         .catch(error => {
@@ -97,18 +93,55 @@ bot.on('/now', (msg) => {
         })
 });
 
-bot.on('/hide', (msg) => msg.reply.text('Type /start to show keyboard again.', { replyMarkup: 'hide' }));
+bot.on('/hide', (msg) => {
 
-bot.on('/hello', (msg) => msg.reply.text('Welcome! \nEnter the date in the format \'dd.mm.yyyy\'\nor \'/now\' for the current date'));
+    let date = new Date(Date.now());
+
+    service.insertDB(msg.text, msg.from.first_name, date.toISOString(),
+        'Type /start to show keyboard again.')
+        .then(() => {
+            msg.reply.text('Type /start to show keyboard again.', { replyMarkup: 'hide' });
+        })
+        .catch(error => {
+            msg.reply.text(error.message);
+        })
+
+});
+
+bot.on('/hello', (msg) => {
+
+    let date = new Date(Date.now());
+
+    service.insertDB(msg.text, msg.from.first_name, date.toISOString(),
+        'Welcome! Enter the date in the format \'dd.mm.yyyy\' or \'/now\' for the current date')
+        .then(() => {
+            msg.reply.text('Welcome! \nEnter the date in the format \'dd.mm.yyyy\'\nor \'/now\' for the current date');
+        })
+        .catch(error => {
+            msg.reply.text(error.message);
+        })
+
+});
+
 
 bot.on('/start', (msg) => {
 
-    let replyMarkup = bot.keyboard([
-        [BUTTONS.hello.label, BUTTONS.world.label],
-        [BUTTONS.hide.label]
-    ], { resize: true });
+    let date = new Date(Date.now());
 
-    return bot.sendMessage(msg.from.id, 'See keyboard below.', { replyMarkup });
+    service.insertDB(msg.text, msg.from.first_name, date.toISOString(),
+        `See keyboard below. id = ${msg.chat.id}`)
+        .then(() => {
+            let replyMarkup = bot.keyboard([
+                [BUTTONS.hello.label, BUTTONS.world.label],
+                [BUTTONS.hide.label]
+            ], { resize: true });
+            
+            return bot.sendMessage(msg.chat.id, 'See keyboard below.', { replyMarkup });
+
+        })
+        .catch(error => {
+            msg.reply.text(error.message);
+        })
 
 });
 
