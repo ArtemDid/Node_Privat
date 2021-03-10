@@ -128,6 +128,7 @@ bot.on('/start', (msg) => {
     service.insertDB(msg.text, msg.from.first_name, date.toISOString(),
         `See keyboard below. id = ${msg.chat.id}`)
         .then(() => {
+            console.log('kkk')
             let replyMarkup = bot.keyboard([
                 [BUTTONS.hello.label, BUTTONS.world.label],
                 [BUTTONS.hide.label]
