@@ -19,7 +19,7 @@ const insertDB = (query, user_name, date, answer) => {
                     if (error) {
                         reject(error)
                     }
-                    if (results.rows[0].id) {
+                    if (results===undefined) {
                         resolve('OK');
                     }
                     console.log("ggg")
