@@ -143,8 +143,18 @@ bot.on('/start', (msg) => {
 
 });
 
-require('https').createServer().listen(process.env.PORT || 55000).on('request', function(req, res){
-    res.end('')
-  });
+server.get('/', (req, res) => {
+    service.getDB()
+        .then(response => {
+            res.status(200).send(response);
+        })
+        .catch(error => {
+            res.status(500).send(error);
+        })
+})
+
+// require('https').createServer().listen(process.env.PORT || 55000).on('request', function (req, res) {
+//     res.end('')
+// });
 
 bot.start();

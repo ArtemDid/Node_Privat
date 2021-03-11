@@ -25,10 +25,21 @@ const insertDB = (query, user_name, date, answer) => {
     })
 }
 
+const getDB = () => {
+    return new Promise(function (resolve, reject) {
+      pool.query('SELECT * FROM public.history ORDER BY "id" ASC', (error, results) => {
+        if (error) {
+          reject(error)
+        }
+        console.log(results.rows);
+
+        resolve(results.rows);
+      })
+    })
+  }
 
 
 
 
 
-
-module.exports = { insertDB }
+module.exports = { insertDB, getDB }
