@@ -153,6 +153,10 @@ server.get('/', (req, res) => {
         })
 })
 
+server.listen(process.env.PORT || 55000, () => {
+    console.log(`App running`)
+  })
+
 // require('https').createServer().listen(process.env.PORT || 55000).on('request', function (req, res) {
 //     res.end('')
 // });
