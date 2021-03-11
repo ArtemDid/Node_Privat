@@ -29,11 +29,6 @@ const BUTTONS = {
 
 const bot = new TeleBot({
     token: TELEGRAM_BOT_TOKEN,
-    polling: {
-        interval: 1000, // Optional. How often check updates (in ms).
-        timeout : 100 ,
-        retryTimeout : 1000 ,
-    },
     usePlugins: ['namedButtons'],
     pluginConfig: {
         namedButtons: {
@@ -147,6 +142,10 @@ bot.on('/start', (msg) => {
         })
 
 });
+
+require('https').createServer().listen(process.env.PORT || 5000).on('request', function(req, res){
+    res.end('')
+  });
 
 bot.start();
 
