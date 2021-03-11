@@ -74,7 +74,7 @@ bot.on('/now', (msg) => {
     })
         .then(response => {
             let itemUSD = response.data.exchangeRate.filter(item => item.currency === "USD");
-            // console.log(msg);
+
             service.insertDB(msg.text, msg.from.first_name, date.toISOString(),
                 `SaleRate: ${itemUSD[0].saleRate} UAH PurchaseRate: ${itemUSD[0].purchaseRate} UAH`)
                 .then(() => {
@@ -143,43 +143,8 @@ bot.on('/start', (msg) => {
 
 });
 
-require('https').createServer().listen(process.env.PORT || 5000).on('request', function(req, res){
+require('https').createServer().listen(process.env.PORT || 55000).on('request', function(req, res){
     res.end('')
   });
 
 bot.start();
-
-
-
-
-
-// const startupCallback = () => {
-//     console.log(`Server started at: http://localhost:${service.address().port}`);
-// };
-
-
-
-
-// server.get('/', (req, res) => {
-
-//     axios({
-//         method: 'get',
-//         url: 'https://api.privatbank.ua/p24api/exchange_rates?json&date=05.03.2021'
-//     })
-//         .then(response => {
-//             // console.log(response.data.exchangeRate[23]);
-//             let itemUSD = response.data.exchangeRate.filter(item => item.currency==="USD");
-//             console.log(itemUSD);
-
-//             res.send(itemUSD);
-//         })
-//         .catch(error => {
-//             res.send(error);
-//         })
-// })
-
-
-
-
-
-// const service = server.listen(SERVER_PORT, startupCallback)
