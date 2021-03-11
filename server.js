@@ -29,6 +29,9 @@ const BUTTONS = {
 
 const bot = new TeleBot({
     token: TELEGRAM_BOT_TOKEN,
+    polling: {
+        interval: 1000, // Optional. How often check updates (in ms).
+    },
     usePlugins: ['namedButtons'],
     pluginConfig: {
         namedButtons: {
